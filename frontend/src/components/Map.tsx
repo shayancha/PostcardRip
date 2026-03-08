@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 import { useRoute } from "../hooks/useRoute";
+import { calculateToll, formatToll } from "../utils/calculateToll";
 import type { VehicleType } from "../types";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
@@ -27,7 +28,7 @@ interface Props {
   onRouteChange?: (entersZone: boolean) => void;
 }
 
-export default function Map({ vehicleType: _vehicleType, departureTime: _departureTime, onRouteChange }: Props) {
+export default function Map({ vehicleType, departureTime, onRouteChange }: Props) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const originMarker = useRef<mapboxgl.Marker | null>(null);
@@ -188,23 +189,49 @@ export default function Map({ vehicleType: _vehicleType, departureTime: _departu
         {/* Route summary */}
         {loading && <div className="route-summary loading">Calculating route…</div>}
         {error && <div className="route-summary error">{error}</div>}
-        {route && !loading && (
-          <div className="route-summary">
-            <div className="summary-row">
-              <span>{formatDuration(route.durationSeconds)}</span>
-              <span>{formatDistance(route.distanceMeters)}</span>
+        {route && !loading && (() => {
+          const toll = calculateToll(vehicleType, departureTime, route.entersZone);
+          return (
+            <div className="route-summary">
+              <div className="summary-row">
+                <span>{formatDuration(route.durationSeconds)}</span>
+                <span>{formatDistance(route.distanceMeters)}</span>
+              </div>
+              {route.entersZone ? (
+                <div className="zone-badge zone-badge--enters">
+                  <div className="zone-badge-title">Enters Congestion Relief Zone</div>
+                  {toll && (
+                    <div className="toll-details">
+                      <div className="toll-row">
+                        <span>Toll ({toll.period})</span>
+                        <span className="toll-amount">{formatToll(toll.amount)}</span>
+                      </div>
+                      {toll.crossingCredit > 0 && (
+                        <div className="toll-row toll-credit">
+                          <span>Crossing credit</span>
+                          <span>−{formatToll(toll.crossingCredit)}</span>
+                        </div>
+                      )}
+                      {toll.crossingCredit > 0 && (
+                        <div className="toll-row toll-net">
+                          <span>Net toll</span>
+                          <span>{formatToll(toll.netAmount)}</span>
+                        </div>
+                      )}
+                      {toll.dailyCap && (
+                        <div className="toll-cap-note">Charged once per day</div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="zone-badge zone-badge--clear">
+                  No congestion toll
+                </div>
+              )}
             </div>
-            {route.entersZone ? (
-              <div className="zone-badge zone-badge--enters">
-                Enters Congestion Relief Zone
-              </div>
-            ) : (
-              <div className="zone-badge zone-badge--clear">
-                Does not enter Congestion Relief Zone
-              </div>
-            )}
-          </div>
-        )}
+          );
+        })()}
       </div>
 
       {/* Map container */}

@@ -233,7 +233,7 @@
 
 .zone-badge {
   font-size: 0.78rem;
-  padding: 0.3rem 0.5rem;
+  padding: 0.4rem 0.6rem;
   border-radius: 6px;
   font-weight: 500;
 }
@@ -248,9 +248,50 @@
   background: #dcfce7;
   color: #14532d;
   border: 1px solid #86efac;
+  font-size: 0.8rem;
 }
 
-.entry-point {
-  font-weight: 400;
+.zone-badge-title {
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+
+.toll-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin-top: 0.25rem;
+  padding-top: 0.35rem;
+  border-top: 1px solid #fbbf24;
+}
+
+.toll-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+}
+
+.toll-amount {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.toll-credit {
   color: #78350f;
+  opacity: 0.8;
+}
+
+.toll-net {
+  font-weight: 600;
+  border-top: 1px solid #fbbf2480;
+  padding-top: 0.2rem;
+  margin-top: 0.1rem;
+}
+
+.toll-cap-note {
+  font-size: 0.72rem;
+  opacity: 0.65;
+  margin-top: 0.15rem;
+  font-style: italic;
 }
